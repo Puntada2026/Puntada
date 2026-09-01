@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Puntada — Sewing Community</title>
+<style>
+:root{
+  --bg:#fffaf6;--surface:#fff;--text:#403b46;--muted:#8b8490;
+  --pink:#f7dce7;--lav:#e9e2f8;--sage:#dfeee5;--line:#eee7e9;
+  --dark:#51485a;--shadow:0 10px 30px rgba(73,55,70,.08)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1200px;margin:auto;min-height:100vh}
+header{height:72px;background:rgba(255,255,255,.96);display:flex;align-items:center;
+justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);
+position:sticky;top:0;z-index:10}
+.logo{font-size:25px;font-weight:800}.nav{display:flex;gap:5px}
+.nav button,.topbtn{border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:13px}
+.nav button.active,.nav button:hover{background:var(--pink);color:var(--text)}
+.topbtn{font-size:18px}.page{display:none}.page.active{display:block}
+main{padding:26px}.hero{background:linear-gradient(110deg,var(--pink),var(--lav));
+border-radius:28px;padding:34px;display:flex;justify-content:space-between;align-items:center;
+box-shadow:var(--shadow)}.hero h1{font-size:40px;margin:8px 0}
+.hero p{max-width:620px;line-height:1.5;color:#665e68}.primary{border:0;background:var(--dark);
+color:#fff;padding:13px 20px;border-radius:15px;font-weight:bold}
+.section{margin-top:28px}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.feed{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.user{display:flex;gap:10px;align-items:center}.avatar{width:44px;height:44px;border-radius:50%;
+display:grid;place-items:center;background:var(--lav)}.meta{font-size:13px;color:var(--muted)}
+.postimg{height:200px;border-radius:17px;margin:15px 0;background:linear-gradient(135deg,#f6e5ec,#eee9fb);
+display:grid;place-items:center;font-size:68px}.actions{display:flex;gap:18px;color:var(--muted);margin-top:12px}
+.actions button{border:0;background:transparent;color:inherit}.liked{color:#c55d86!important}
+.search{display:flex;gap:10px}.search input{flex:1;border:1px solid var(--line);border-radius:15px;padding:13px 16px;background:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.chip{border:1px solid var(--line);
+background:#fff;padding:9px 13px;border-radius:13px}.chip.active{background:var(--lav)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.progress{height:8px;background:var(--line);border-radius:9px;margin:14px 0}.progress i{display:block;height:100%;width:65%;
+background:#d7c5e8;border-radius:9px}.learn{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.studio{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric{padding:20px;background:#fff;
+border:1px solid var(--line);border-radius:20px}.metric b{font-size:28px;display:block;margin-top:8px}
+.profile{display:grid;grid-template-columns:240px 1fr;gap:24px}.profilehead{text-align:center}
+.bigavatar{width:120px;height:120px;margin:auto;border-radius:50%;display:grid;place-items:center;background:var(--pink);font-size:55px}
+.stats{display:flex;gap:20px;justify-content:center;margin:16px 0}.stat b{display:block;font-size:20px}
+.settings{display:grid;gap:12px;max-width:700px}.setting{background:#fff;border:1px solid var(--line);
+border-radius:18px;padding:17px;display:flex;justify-content:space-between;align-items:center}
+.modal{display:none;position:fixed;inset:0;background:#0005;z-index:30;place-items:center}.modal.open{display:grid}
+.modalbox{background:#fff;border-radius:22px;padding:24px;width:min(440px,92%);box-shadow:var(--shadow)}
+.modalbox input,.modalbox textarea,.modalbox select{width:100%;padding:12px;margin:8px 0;border:1px solid var(--line);border-radius:13px}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--dark);color:#fff;padding:12px 16px;border-radius:14px;display:none;z-index:50}
+.mobile{display:none}
+.empty{padding:35px;text-align:center;color:var(--muted)}
+.rtl{direction:rtl}
+@media(max-width:800px){
+ header{padding:0 14px}.nav{display:none}main{padding:16px}.hero{padding:24px}.hero h1{font-size:31px}
+ .hero-art{display:none}.feed,.grid,.learn{grid-template-columns:1fr}.profile{grid-template-columns:1fr}
+ .studio{grid-template-columns:1fr 1fr}.app{padding-bottom:70px}
+ .mobile{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+ z-index:20;justify-content:space-around;padding:8px}.mobile button{border:0;background:transparent;color:var(--muted);font-size:12px}
+ .mobile .create{background:var(--pink);border-radius:50%;width:48px;height:48px;margin-top:-22px;font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">Puntada 🧵</div>
+  <nav class="nav">
+    <button data-page="home" class="active">Home</button>
+    <button data-page="discover">Discover</button>
+    <button data-page="projects">Projects</button>
+    <button data-page="learn">Learn</button>
+    <button data-page="studio">Studio</button>
+  </nav>
+  <div>
+    <button class="topbtn" data-page="notifications">🔔</button>
+    <button class="topbtn" data-page="messages">💬</button>
+    <button class="topbtn" data-page="profile">👤</button>
+    <button class="topbtn" data-page="settings">⚙️</button>
+  </div>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero"><div><small>CREATE · LEARN · SHARE</small>
+    <h1>What are you creating today?</h1>
+    <p>A joyful global space for sewing, fashion, embroidery, patterns and handmade creativity.</p>
+    <button class="primary" id="createBtn">＋ Create</button>
+  </div><div class="hero-art" style="font-size:80px">🪡🧵</div></div>
+  <div class="section"><div class="title"><h2>For you ✨</h2><span>See all</span></div>
+    <div class="feed">
+      <article class="card">
+        <div class="user"><div class="avatar">🌸</div><div><b>Mia</b><div class="meta">France · Sewing</div></div></div>
+        <div class="postimg">👗</div><b>A summer dress made from linen</b>
+        <div class="meta">Sharing the little details behind this project.</div>
+        <div class="actions"><button class="like">♡ 2.4K</button><button>💬 183</button><button class="save">🔖 Save</button></div>
+      </article>
+      <article class="card">
+        <div class="user"><div class="avatar">🪻</div><div><b>Sofia</b><div class="meta">Spain · Embroidery</div></div></div>
+        <div class="postimg">🪡</div><b>Three tiny stitches that changed my design</b>
+        <div class="meta">A quick tip for beginners.</div>
+        <div class="actions"><button class="like">♡ 1.8K</button><button>💬 94</button><button class="save">🔖 Save</button></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="discover" class="page">
+  <h1>Discover 🔎</h1>
+  <div class="search"><input id="searchInput" placeholder="Search people, projects, patterns or lessons"><button class="primary" id="searchBtn">Search</button></div>
+  <div class="chips"><button class="chip active">For You</button><button class="chip">Creators</button><button class="chip">Projects</button><button class="chip">Patterns</button><button class="chip">Learn</button></div>
+  <div class="grid" id="discoverGrid">
+    <div class="card"><h3>🌸 Sewing</h3><p class="meta">Explore sewing creators and projects.</p></div>
+    <div class="card"><h3>🪡 Embroidery</h3><p class="meta">Ideas, stitches and tutorials.</p></div>
+    <div class="card"><h3>👗 Fashion Design</h3><p class="meta">Design inspiration from around the world.</p></div>
+  </div>
+</section>
+
+<section id="projects" class="page">
+  <div class="title"><h1>My Projects 🧵</h1><button class="primary" id="newProject">＋ New project</button></div>
+  <div class="chips"><button class="chip active">All</button><button class="chip">In progress</button><button class="chip">Completed</button></div>
+  <div class="grid" id="projectGrid">
+    <div class="card"><h3>👗 Summer Dress</h3><p class="meta">Linen · Pattern #24</p><div class="progress"><i></i></div><b>65% complete</b></div>
+    <div class="card"><h3>👜 Canvas Bag</h3><p class="meta">Cotton · Personal design</p><div class="progress"><i style="width:30%"></i></div><b>30% complete</b></div>
+    <div class="card"><h3>🪡 Floral Embroidery</h3><p class="meta">Hand embroidery</p><div class="progress"><i style="width:100%"></i></div><b>Completed ✓</b></div>
+  </div>
+</section>
+
+<section id="learn" class="page">
+  <h1>Learn 📚</h1><p class="meta">Learn at your own pace.</p>
+  <div class="chips"><button class="chip active">Beginner</button><button class="chip">Intermediate</button><button class="chip">Advanced</button></div>
+  <div class="learn">
+    <div class="card"><h3>How to sew a zipper</h3><p class="meta">Beginner · 12 min</p><button class="follow chip">Start lesson</button></div>
+    <div class="card"><h3>Pattern basics</h3><p class="meta">Beginner · 20 min</p><button class="follow chip">Start lesson</button></div>
+    <div class="card"><h3>Embroidery stitches</h3><p class="meta">Beginner · 15 min</p><button class="follow chip">Start lesson</button></div>
+  </div>
+</section>
+
+<section id="studio" class="page">
+  <h1>Studio 💼</h1><p class="meta">Tools for creators and sewing businesses.</p>
+  <div class="studio">
+    <div class="metric">Active orders<b>8</b></div><div class="metric">Clients<b>34</b></div>
+    <div class="metric">Due this week<b>3</b></div><div class="metric">Earnings<b>$240</b></div>
+  </div>
+  <div class="section grid">
+    <div class="card"><h3>📦 Orders</h3><p class="meta">New → In progress → Ready → Delivered</p></div>
+    <div class="card"><h3>👥 Clients</h3><p class="meta">Measurements and notes.</p></div>
+    <div class="card"><h3>📅 Calendar</h3><p class="meta">Fittings and delivery dates.</p></div>
+  </div>
+</section>
+
+<section id="profile" class="page">
+  <div class="profile"><div class="card profilehead"><div class="bigavatar">🌷</div><h2>Amelia</h2>
+    <p class="meta">UK · Fashion & Sewing</p><button class="follow chip">Follow</button>
+    <div class="stats"><div class="stat"><b>128</b><span class="meta">Projects</span></div><div class="stat"><b>2.4K</b><span class="meta">Followers</span></div></div>
+  </div><div><h1>Portfolio</h1><div class="grid"><div class="card postimg">👗</div><div class="card postimg">👜</div><div class="card postimg">🪡</div></div></div></div>
+</section>
+
+<section id="messages" class="page"><h1>Messages 💬</h1><div class="grid">
+  <div class="card"><b>Emma</b><p class="meta">Can you make this dress in blue?</p></div>
+  <div class="card"><b>Sofia</b><p class="meta">I loved your tutorial!</p></div>
+  <div class="card"><b>Mia</b><p class="meta">Your project is beautiful ✨</p></div>
+</div></section>
+
+<section id="notifications" class="page"><h1>Notifications 🔔</h1><div class="settings">
+  <div class="setting">❤️ Mia liked your project.<span>now</span></div>
+  <div class="setting">👤 Sofia started following you.<span>1h</span></div>
+  <div class="setting">💼 Emma's fitting is tomorrow.<span>3h</span></div>
+</div></section>
+
+<section id="settings" class="page"><h1>Settings ⚙️</h1><div class="settings">
+  <div class="setting"><span>👤 Account</span><span>›</span></div>
+  <div class="setting"><span>🌍 Language</span><select id="language"><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option></select></div>
+  <div class="setting"><span>🔔 Notifications</span><span>›</span></div>
+  <div class="setting"><span>🔒 Privacy</span><span>›</span></div>
+  <div class="setting"><span>🛡️ Safety</span><span>›</span></div>
+  <div class="setting"><span>🎨 Appearance</span><select><option>System</option><option>Light</option><option>Dark</option></select></div>
+</div></section>
+</main>
+
+<nav class="mobile">
+  <button data-page="home">🏠<br>Home</button><button data-page="discover">🔎<br>Discover</button>
+  <button class="create" id="mobileCreate">＋</button><button data-page="projects">🧵<br>Projects</button><button data-page="profile">👤<br>Profile</button>
+</nav>
+</div>
+
+<div id="modal" class="modal"><div class="modalbox">
+  <h2 id="modalTitle">Create on Puntada ✨</h2>
+  <p class="meta">Choose what you want to create.</p>
+  <div id="createChoices">
+    <button class="chip" data-create="Post">📸 Post</button>
+    <button class="chip" data-create="Project">🧵 Project</button>
+    <button class="chip" data-create="Tutorial">📚 Tutorial</button>
+  </div>
+  <div id="projectForm" style="display:none">
+    <input id="projectName" placeholder="Project name">
+    <textarea id="projectDesc" placeholder="Short description"></textarea>
+    <button class="primary" id="addProject">Add project</button>
+  </div>
+  <br><button class="chip" id="closeModal">Close</button>
+</div></div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Puntada backend configuration: replace ONLY these two placeholders with your Supabase Project URL and Publishable key.
+const PUNTADA_SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const PUNTADA_SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+const puntadaSupabase = (window.supabase && !PUNTADA_SUPABASE_URL.startsWith('YOUR_'))
+  ? window.supabase.createClient(PUNTADA_SUPABASE_URL, PUNTADA_SUPABASE_PUBLISHABLE_KEY)
+  : null;
+</script>
+<script>
+const pages=[...document.querySelectorAll('.page')];
+function show(id){
+  pages.forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));
+
+const modal=document.getElementById('modal'), choices=document.getElementById('createChoices'), form=document.getElementById('projectForm');
+function openCreate(){modal.classList.add('open');choices.style.display='block';form.style.display='none'}
+function closeCreate(){modal.classList.remove('open')}
+document.getElementById('createBtn').onclick=openCreate;
+document.getElementById('mobileCreate').onclick=openCreate;
+document.getElementById('newProject').onclick=()=>{openCreate();choices.style.display='none';form.style.display='block'};
+document.getElementById('closeModal').onclick=closeCreate;
+document.querySelectorAll('[data-create]').forEach(b=>b.onclick=()=>{
+  if(b.dataset.create==='Project'){choices.style.display='none';form.style.display='block'}
+  else{closeCreate();toast(b.dataset.create+' creation flow is ready for the next build step ✨')}
+});
+document.getElementById('addProject').onclick=()=>{
+  const name=document.getElementById('projectName').value.trim()||'New Project';
+  const desc=document.getElementById('projectDesc').value.trim()||'Personal sewing project';
+  const card=document.createElement('div');card.className='card';
+  card.innerHTML='<h3>🧵 '+escapeHtml(name)+'</h3><p class="meta">'+escapeHtml(desc)+'</p><div class="progress"><i style="width:5%"></i></div><b>5% complete</b>';
+  document.getElementById('projectGrid').appendChild(card);closeCreate();show('projects');toast('Project added ✨');
+};
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+document.querySelectorAll('.like').forEach(b=>b.onclick=()=>{b.classList.toggle('liked');b.textContent=b.classList.contains('liked')?'♥ Liked':'♡ Like'});
+document.querySelectorAll('.save').forEach(b=>b.onclick=()=>{b.textContent=b.textContent.includes('Saved')?'🔖 Save':'🔖 Saved';toast('Saved to your collection')});
+document.getElementById('searchBtn').onclick=()=>{
+ const q=document.getElementById('searchInput').value.trim();
+ toast(q?'Searching Puntada for “'+q+'”':'Type something to search');
+};
+document.querySelectorAll('.chip').forEach(b=>{
+ if(!b.dataset.create && b.id!=='closeModal' && !b.classList.contains('follow'))
+ b.addEventListener('click',()=>{const group=b.parentElement;group.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
+});
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>t.style.display='none',2200)}
+const lang=document.getElementById('language');
+lang.onchange=()=>{document.documentElement.lang=lang.value;document.documentElement.dir=lang.value==='ar'?'rtl':'ltr';toast('Language set to '+lang.options[lang.selectedIndex].text)};
+</script>
+</body>
+</html>
