@@ -112,9 +112,7 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
   <div class="title"><h1>My Projects 🧵</h1><button class="primary" id="newProject">＋ New project</button></div>
   <div class="chips"><button class="chip active">All</button><button class="chip">In progress</button><button class="chip">Completed</button></div>
   <div class="grid" id="projectGrid">
-    <div class="card"><h3>👗 Summer Dress</h3><p class="meta">Linen · Pattern #24</p><div class="progress"><i></i></div><b>65% complete</b></div>
-    <div class="card"><h3>👜 Canvas Bag</h3><p class="meta">Cotton · Personal design</p><div class="progress"><i style="width:30%"></i></div><b>30% complete</b></div>
-    <div class="card"><h3>🪡 Floral Embroidery</h3><p class="meta">Hand embroidery</p><div class="progress"><i style="width:100%"></i></div><b>Completed ✓</b></div>
+    <div class="empty">Log in to see your projects.</div>
   </div>
 </section>
 
@@ -244,6 +242,7 @@ function show(id){
   document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='profile') renderProfilePage();
+  if(id==='projects') loadProjects();
 }
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));
 
@@ -267,13 +266,37 @@ document.querySelectorAll('[data-create]').forEach(b=>b.onclick=()=>{
   else if(b.dataset.create==='Project'){choices.style.display='none';form.style.display='block'}
   else{closeCreate();toast(b.dataset.create+' creation flow is ready for the next build step ✨')}
 });
-document.getElementById('addProject').onclick=()=>{
-  const name=document.getElementById('projectName').value.trim()||'New Project';
-  const desc=document.getElementById('projectDesc').value.trim()||'Personal sewing project';
-  const card=document.createElement('div');card.className='card';
-  card.innerHTML='<h3>🧵 '+escapeHtml(name)+'</h3><p class="meta">'+escapeHtml(desc)+'</p><div class="progress"><i style="width:5%"></i></div><b>5% complete</b>';
-  document.getElementById('projectGrid').appendChild(card);closeCreate();show('projects');toast('Project added ✨ (saved on this device for now)');
+document.getElementById('addProject').onclick=async ()=>{
+  const name=document.getElementById('projectName').value.trim();
+  const desc=document.getElementById('projectDesc').value.trim();
+  if(!name){ toast('Give your project a name'); return; }
+  if(!puntadaSupabase || !currentUser){ toast('Log in first'); return; }
+  const {error}=await puntadaSupabase.from('projects').insert({
+    owner_id:currentUser.id, name, project_type:desc||null, progress:5
+  });
+  if(error){ toast('Could not save project: '+error.message); return; }
+  document.getElementById('projectName').value='';
+  document.getElementById('projectDesc').value='';
+  closeCreate(); show('projects'); toast('Project added ✨');
+  loadProjects();
 };
+
+async function loadProjects(){
+  const gridEl=document.getElementById('projectGrid');
+  if(!puntadaSupabase) return;
+  if(!currentUser){ gridEl.innerHTML='<div class="empty">Log in to see your projects.</div>'; return; }
+  const {data:projects,error}=await puntadaSupabase.from('projects').select('*').eq('owner_id',currentUser.id).order('created_at',{ascending:false});
+  if(error){ gridEl.innerHTML='<div class="empty">Could not load projects.<br><small style="color:#c55d86">'+escapeHtml(error.message)+'</small></div>'; return; }
+  if(!projects || projects.length===0){ gridEl.innerHTML='<div class="empty">No projects yet. Tap "＋ Create" → Project to add one.</div>'; return; }
+  gridEl.innerHTML = projects.map(p=>`
+    <div class="card" data-project-id="${p.id}">
+      <h3>🧵 ${escapeHtml(p.name)}</h3>
+      <p class="meta">${escapeHtml(p.project_type||'')}</p>
+      <div class="progress"><i style="width:${p.progress}%"></i></div>
+      <b>${p.progress>=100?'Completed ✓':p.progress+'% complete'}</b>
+    </div>
+  `).join('');
+}
 document.getElementById('addPost').onclick=async ()=>{
   const content=document.getElementById('postContent').value.trim();
   if(!content){ toast('Write something first'); return; }
@@ -379,6 +402,7 @@ async function refreshAuth(){
   }
   document.getElementById('accountRowStatus').textContent = currentUser ? ((currentProfile?.full_name||'Account')+' ›') : 'Log in / Sign up ›';
   if(document.getElementById('profile').classList.contains('active')) renderProfilePage();
+  if(document.getElementById('projects').classList.contains('active')) loadProjects();
   loadFeed();
 }
 
@@ -425,7 +449,7 @@ async function loadFeed(){
     .order('created_at',{ascending:false})
     .limit(20);
 
-  if(error){ feedEl.innerHTML='<div class="empty">Could not load posts.</div>'; return; }
+  if(error){ feedEl.innerHTML='<div class="empty">Could not load posts.<br><small style="color:#c55d86">'+escapeHtml(error.message||JSON.stringify(error))+'</small></div>'; return; }
   if(!posts || posts.length===0){
     feedEl.innerHTML='<div class="empty">No posts yet. Be the first to share something! Tap "＋ Create".</div>';
     statusEl.textContent='';
