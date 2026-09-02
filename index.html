@@ -46,9 +46,9 @@ border:1px solid var(--line);border-radius:20px}.metric b{font-size:28px;display
 .bigavatar{width:120px;height:120px;margin:auto;border-radius:50%;display:grid;place-items:center;background:var(--pink);font-size:55px}
 .stats{display:flex;gap:20px;justify-content:center;margin:16px 0}.stat b{display:block;font-size:20px}
 .settings{display:grid;gap:12px;max-width:700px}.setting{background:#fff;border:1px solid var(--line);
-border-radius:18px;padding:17px;display:flex;justify-content:space-between;align-items:center}
+border-radius:18px;padding:17px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .modal{display:none;position:fixed;inset:0;background:#0005;z-index:30;place-items:center}.modal.open{display:grid}
-.modalbox{background:#fff;border-radius:22px;padding:24px;width:min(440px,92%);box-shadow:var(--shadow)}
+.modalbox{background:#fff;border-radius:22px;padding:24px;width:min(440px,92%);box-shadow:var(--shadow);max-height:88vh;overflow:auto}
 .modalbox input,.modalbox textarea,.modalbox select{width:100%;padding:12px;margin:8px 0;border:1px solid var(--line);border-radius:13px}
 .toast{position:fixed;right:18px;bottom:18px;background:var(--dark);color:#fff;padding:12px 16px;border-radius:14px;display:none;z-index:50}
 .mobile{display:none}
@@ -78,7 +78,7 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
   <div>
     <button class="topbtn" data-page="notifications">🔔</button>
     <button class="topbtn" data-page="messages">💬</button>
-    <button class="topbtn" data-page="profile">👤</button>
+    <button class="topbtn" id="personBtn">👤</button>
     <button class="topbtn" data-page="settings">⚙️</button>
   </div>
 </header>
@@ -90,20 +90,9 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
     <p>A joyful global space for sewing, fashion, embroidery, patterns and handmade creativity.</p>
     <button class="primary" id="createBtn">＋ Create</button>
   </div><div class="hero-art" style="font-size:80px">🪡🧵</div></div>
-  <div class="section"><div class="title"><h2>For you ✨</h2><span>See all</span></div>
-    <div class="feed">
-      <article class="card">
-        <div class="user"><div class="avatar">🌸</div><div><b>Mia</b><div class="meta">France · Sewing</div></div></div>
-        <div class="postimg">👗</div><b>A summer dress made from linen</b>
-        <div class="meta">Sharing the little details behind this project.</div>
-        <div class="actions"><button class="like">♡ 2.4K</button><button>💬 183</button><button class="save">🔖 Save</button></div>
-      </article>
-      <article class="card">
-        <div class="user"><div class="avatar">🪻</div><div><b>Sofia</b><div class="meta">Spain · Embroidery</div></div></div>
-        <div class="postimg">🪡</div><b>Three tiny stitches that changed my design</b>
-        <div class="meta">A quick tip for beginners.</div>
-        <div class="actions"><button class="like">♡ 1.8K</button><button>💬 94</button><button class="save">🔖 Save</button></div>
-      </article>
+  <div class="section"><div class="title"><h2>Community feed ✨</h2><span id="feedStatus" class="meta"></span></div>
+    <div class="feed" id="homeFeed">
+      <div class="empty">Loading posts…</div>
     </div>
   </div>
 </section>
@@ -153,10 +142,13 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
 </section>
 
 <section id="profile" class="page">
-  <div class="profile"><div class="card profilehead"><div class="bigavatar">🌷</div><h2>Amelia</h2>
-    <p class="meta">UK · Fashion & Sewing</p><button class="follow chip">Follow</button>
-    <div class="stats"><div class="stat"><b>128</b><span class="meta">Projects</span></div><div class="stat"><b>2.4K</b><span class="meta">Followers</span></div></div>
-  </div><div><h1>Portfolio</h1><div class="grid"><div class="card postimg">👗</div><div class="card postimg">👜</div><div class="card postimg">🪡</div></div></div></div>
+  <div class="profile"><div class="card profilehead">
+    <div class="bigavatar" id="profileAvatar">🌷</div>
+    <h2 id="profileName">Guest</h2>
+    <p class="meta" id="profileCountry">Not signed in</p>
+    <button class="follow chip" id="profileActionBtn">Log in / Sign up</button>
+    <div class="stats"><div class="stat"><b id="profilePostsCount">0</b><span class="meta">Posts</span></div><div class="stat"><b id="profileFollowersCount">0</b><span class="meta">Followers</span></div></div>
+  </div><div><h1>My posts</h1><div class="grid" id="profilePosts"><div class="empty">Sign in to see your posts here.</div></div></div></div>
 </section>
 
 <section id="messages" class="page"><h1>Messages 💬</h1><div class="grid">
@@ -172,7 +164,7 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
 </div></section>
 
 <section id="settings" class="page"><h1>Settings ⚙️</h1><div class="settings">
-  <div class="setting"><span>👤 Account</span><span>›</span></div>
+  <div class="setting" id="accountRow"><span>👤 Account</span><span id="accountRowStatus">Log in / Sign up ›</span></div>
   <div class="setting"><span>🌍 Language</span><select id="language"><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option></select></div>
   <div class="setting"><span>🔔 Notifications</span><span>›</span></div>
   <div class="setting"><span>🔒 Privacy</span><span>›</span></div>
@@ -183,7 +175,7 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
 
 <nav class="mobile">
   <button data-page="home">🏠<br>Home</button><button data-page="discover">🔎<br>Discover</button>
-  <button class="create" id="mobileCreate">＋</button><button data-page="projects">🧵<br>Projects</button><button data-page="profile">👤<br>Profile</button>
+  <button class="create" id="mobileCreate">＋</button><button data-page="projects">🧵<br>Projects</button><button id="mobilePersonBtn">👤<br>Profile</button>
 </nav>
 </div>
 
@@ -195,6 +187,10 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
     <button class="chip" data-create="Project">🧵 Project</button>
     <button class="chip" data-create="Tutorial">📚 Tutorial</button>
   </div>
+  <div id="postForm" style="display:none">
+    <textarea id="postContent" placeholder="What are you working on?" rows="4"></textarea>
+    <button class="primary" id="addPost">Publish</button>
+  </div>
   <div id="projectForm" style="display:none">
     <input id="projectName" placeholder="Project name">
     <textarea id="projectDesc" placeholder="Short description"></textarea>
@@ -202,6 +198,33 @@ border-radius:18px;padding:17px;display:flex;justify-content:space-between;align
   </div>
   <br><button class="chip" id="closeModal">Close</button>
 </div></div>
+
+<div id="authModal" class="modal">
+  <div class="modalbox">
+    <h2 id="authTitle">Log in to Puntada</h2>
+    <div class="chips">
+      <button class="chip active" id="tabLogin">Log in</button>
+      <button class="chip" id="tabSignup">Sign up</button>
+    </div>
+    <div id="loginFields">
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginPassword" type="password" placeholder="Password">
+      <button class="primary" id="loginBtn" style="width:100%">Log in</button>
+    </div>
+    <div id="signupFields" style="display:none">
+      <input id="suFullName" placeholder="Full name">
+      <input id="suUsername" placeholder="Username (no spaces)">
+      <input id="suCountry" placeholder="Country">
+      <input id="suEmail" type="email" placeholder="Email">
+      <input id="suPassword" type="password" placeholder="Password (6+ characters)">
+      <button class="primary" id="signupBtn" style="width:100%">Create account</button>
+    </div>
+    <p id="authError" style="color:#c55d86;font-size:13px"></p>
+    <br><button class="chip" id="closeAuth">Close</button>
+    <button class="chip" id="logoutBtn" style="display:none">Log out</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -214,23 +237,34 @@ const puntadaSupabase = (window.supabase && !PUNTADA_SUPABASE_URL.startsWith('YO
   : null;
 </script>
 <script>
+/* ---------- page navigation ---------- */
 const pages=[...document.querySelectorAll('.page')];
 function show(id){
   pages.forEach(p=>p.classList.toggle('active',p.id===id));
   document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='profile') renderProfilePage();
 }
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));
 
-const modal=document.getElementById('modal'), choices=document.getElementById('createChoices'), form=document.getElementById('projectForm');
-function openCreate(){modal.classList.add('open');choices.style.display='block';form.style.display='none'}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>t.style.display='none',2200)}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+/* ---------- create modal ---------- */
+const modal=document.getElementById('modal'), choices=document.getElementById('createChoices'),
+      form=document.getElementById('projectForm'), postForm=document.getElementById('postForm');
+function openCreate(){
+  if(!currentUser){ toast('Log in first to create a post or project'); openAuth('login'); return; }
+  modal.classList.add('open');choices.style.display='block';form.style.display='none';postForm.style.display='none';
+}
 function closeCreate(){modal.classList.remove('open')}
 document.getElementById('createBtn').onclick=openCreate;
 document.getElementById('mobileCreate').onclick=openCreate;
-document.getElementById('newProject').onclick=()=>{openCreate();choices.style.display='none';form.style.display='block'};
+document.getElementById('newProject').onclick=()=>{openCreate();if(!currentUser)return;choices.style.display='none';form.style.display='block'};
 document.getElementById('closeModal').onclick=closeCreate;
 document.querySelectorAll('[data-create]').forEach(b=>b.onclick=()=>{
-  if(b.dataset.create==='Project'){choices.style.display='none';form.style.display='block'}
+  if(b.dataset.create==='Post'){choices.style.display='none';postForm.style.display='block'}
+  else if(b.dataset.create==='Project'){choices.style.display='none';form.style.display='block'}
   else{closeCreate();toast(b.dataset.create+' creation flow is ready for the next build step ✨')}
 });
 document.getElementById('addProject').onclick=()=>{
@@ -238,22 +272,209 @@ document.getElementById('addProject').onclick=()=>{
   const desc=document.getElementById('projectDesc').value.trim()||'Personal sewing project';
   const card=document.createElement('div');card.className='card';
   card.innerHTML='<h3>🧵 '+escapeHtml(name)+'</h3><p class="meta">'+escapeHtml(desc)+'</p><div class="progress"><i style="width:5%"></i></div><b>5% complete</b>';
-  document.getElementById('projectGrid').appendChild(card);closeCreate();show('projects');toast('Project added ✨');
+  document.getElementById('projectGrid').appendChild(card);closeCreate();show('projects');toast('Project added ✨ (saved on this device for now)');
 };
-function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-document.querySelectorAll('.like').forEach(b=>b.onclick=()=>{b.classList.toggle('liked');b.textContent=b.classList.contains('liked')?'♥ Liked':'♡ Like'});
-document.querySelectorAll('.save').forEach(b=>b.onclick=()=>{b.textContent=b.textContent.includes('Saved')?'🔖 Save':'🔖 Saved';toast('Saved to your collection')});
-document.getElementById('searchBtn').onclick=()=>{
- const q=document.getElementById('searchInput').value.trim();
- toast(q?'Searching Puntada for “'+q+'”':'Type something to search');
+document.getElementById('addPost').onclick=async ()=>{
+  const content=document.getElementById('postContent').value.trim();
+  if(!content){ toast('Write something first'); return; }
+  if(!puntadaSupabase || !currentUser){ toast('Log in first'); return; }
+  const {error}=await puntadaSupabase.from('posts').insert({author_id:currentUser.id, content});
+  if(error){ toast('Could not publish: '+error.message); return; }
+  document.getElementById('postContent').value='';
+  closeCreate(); toast('Posted ✨');
+  loadFeed();
 };
+
 document.querySelectorAll('.chip').forEach(b=>{
- if(!b.dataset.create && b.id!=='closeModal' && !b.classList.contains('follow'))
+ if(!b.dataset.create && b.id!=='closeModal' && b.id!=='tabLogin' && b.id!=='tabSignup' && b.id!=='closeAuth' && b.id!=='logoutBtn' && !b.classList.contains('follow'))
  b.addEventListener('click',()=>{const group=b.parentElement;group.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
 });
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>t.style.display='none',2200)}
+document.getElementById('searchBtn').onclick=()=>{
+ const q=document.getElementById('searchInput').value.trim();
+ toast(q?'Searching Puntada for "'+q+'"':'Type something to search');
+};
 const lang=document.getElementById('language');
 lang.onchange=()=>{document.documentElement.lang=lang.value;document.documentElement.dir=lang.value==='ar'?'rtl':'ltr';toast('Language set to '+lang.options[lang.selectedIndex].text)};
+
+/* ---------- AUTH ---------- */
+let currentUser=null, currentProfile=null;
+const authModal=document.getElementById('authModal');
+function openAuth(tab){
+  authModal.classList.add('open');
+  document.getElementById('authError').textContent='';
+  setAuthTab(tab||'login');
+}
+function closeAuth(){authModal.classList.remove('open')}
+document.getElementById('closeAuth').onclick=closeAuth;
+document.getElementById('personBtn').onclick=()=>{ currentUser? show('profile') : openAuth('login'); };
+document.getElementById('mobilePersonBtn').onclick=()=>{ currentUser? show('profile') : openAuth('login'); };
+document.getElementById('accountRow').onclick=()=>{ currentUser? show('profile') : openAuth('login'); };
+
+function setAuthTab(tab){
+  const isLogin=tab==='login';
+  document.getElementById('tabLogin').classList.toggle('active',isLogin);
+  document.getElementById('tabSignup').classList.toggle('active',!isLogin);
+  document.getElementById('loginFields').style.display=isLogin?'block':'none';
+  document.getElementById('signupFields').style.display=isLogin?'none':'block';
+  document.getElementById('authTitle').textContent=isLogin?'Log in to Puntada':'Create your Puntada account';
+  document.getElementById('logoutBtn').style.display= currentUser? 'inline-block':'none';
+}
+document.getElementById('tabLogin').onclick=()=>setAuthTab('login');
+document.getElementById('tabSignup').onclick=()=>setAuthTab('signup');
+
+document.getElementById('loginBtn').onclick=async ()=>{
+  if(!puntadaSupabase){ authErr('Backend not connected'); return; }
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  const {error}=await puntadaSupabase.auth.signInWithPassword({email,password});
+  if(error){ authErr(error.message); return; }
+  closeAuth(); toast('Welcome back ✨');
+  await refreshAuth();
+};
+
+document.getElementById('signupBtn').onclick=async ()=>{
+  if(!puntadaSupabase){ authErr('Backend not connected'); return; }
+  const full_name=document.getElementById('suFullName').value.trim();
+  const username=document.getElementById('suUsername').value.trim();
+  const country=document.getElementById('suCountry').value.trim();
+  const email=document.getElementById('suEmail').value.trim();
+  const password=document.getElementById('suPassword').value;
+  if(!full_name||!username||!email||password.length<6){ authErr('Please fill all required fields (password 6+ chars).'); return; }
+
+  const {data,error}=await puntadaSupabase.auth.signUp({email,password});
+  if(error){ authErr(error.message); return; }
+
+  if(!data.session){
+    authErr('');
+    toast('Account created. If your project requires email confirmation, check your inbox, then log in.');
+    setAuthTab('login');
+    return;
+  }
+
+  const {error:profileError}=await puntadaSupabase.from('profiles').insert({id:data.user.id, username, full_name, country});
+  if(profileError){ authErr('Account created, but profile could not be saved: '+profileError.message); return; }
+
+  closeAuth(); toast('Account created ✨');
+  await refreshAuth();
+};
+
+document.getElementById('logoutBtn').onclick=async ()=>{
+  if(puntadaSupabase) await puntadaSupabase.auth.signOut();
+  currentUser=null; currentProfile=null;
+  closeAuth(); toast('Logged out');
+  await refreshAuth();
+};
+
+function authErr(msg){ document.getElementById('authError').textContent=msg; }
+
+async function refreshAuth(){
+  if(!puntadaSupabase) return;
+  const {data:{user}}=await puntadaSupabase.auth.getUser();
+  currentUser=user||null;
+  if(currentUser){
+    const {data:p}=await puntadaSupabase.from('profiles').select('*').eq('id',currentUser.id).single();
+    currentProfile=p||null;
+  } else {
+    currentProfile=null;
+  }
+  document.getElementById('accountRowStatus').textContent = currentUser ? ((currentProfile?.full_name||'Account')+' ›') : 'Log in / Sign up ›';
+  if(document.getElementById('profile').classList.contains('active')) renderProfilePage();
+  loadFeed();
+}
+
+/* ---------- PROFILE PAGE ---------- */
+async function renderProfilePage(){
+  const nameEl=document.getElementById('profileName'), countryEl=document.getElementById('profileCountry'),
+        avatarEl=document.getElementById('profileAvatar'), actionBtn=document.getElementById('profileActionBtn'),
+        postsEl=document.getElementById('profilePosts'), postsCountEl=document.getElementById('profilePostsCount'),
+        followersEl=document.getElementById('profileFollowersCount');
+
+  if(!currentUser || !currentProfile){
+    nameEl.textContent='Guest'; countryEl.textContent='Not signed in'; avatarEl.textContent='🌷';
+    actionBtn.textContent='Log in / Sign up'; actionBtn.onclick=()=>openAuth('login');
+    postsEl.innerHTML='<div class="empty">Sign in to see your posts here.</div>';
+    postsCountEl.textContent='0'; followersEl.textContent='0';
+    return;
+  }
+
+  nameEl.textContent=currentProfile.full_name;
+  countryEl.textContent=(currentProfile.country||'')+ (currentProfile.username? ' · @'+currentProfile.username:'');
+  avatarEl.textContent=(currentProfile.full_name||'?')[0].toUpperCase();
+  actionBtn.textContent='Log out';
+  actionBtn.onclick=async ()=>{ await puntadaSupabase.auth.signOut(); currentUser=null; currentProfile=null; toast('Logged out'); await refreshAuth(); };
+
+  const {data:myPosts}=await puntadaSupabase.from('posts').select('id,content,created_at').eq('author_id',currentUser.id).order('created_at',{ascending:false});
+  postsCountEl.textContent=(myPosts||[]).length;
+
+  const {count:followers}=await puntadaSupabase.from('follows').select('*',{count:'exact',head:true}).eq('following_id',currentUser.id);
+  followersEl.textContent=followers||0;
+
+  postsEl.innerHTML = (myPosts&&myPosts.length)
+    ? myPosts.map(p=>'<div class="card postimg" title="'+escapeHtml(p.content)+'">🧵</div>').join('')
+    : '<div class="empty">No posts yet — share your first project!</div>';
+}
+
+/* ---------- HOME FEED ---------- */
+async function loadFeed(){
+  const feedEl=document.getElementById('homeFeed'), statusEl=document.getElementById('feedStatus');
+  if(!puntadaSupabase){ feedEl.innerHTML='<div class="empty">Backend not connected.</div>'; return; }
+
+  const {data:posts,error}=await puntadaSupabase
+    .from('posts')
+    .select('id,content,created_at,author_id,profiles(username,full_name,country)')
+    .order('created_at',{ascending:false})
+    .limit(20);
+
+  if(error){ feedEl.innerHTML='<div class="empty">Could not load posts.</div>'; return; }
+  if(!posts || posts.length===0){
+    feedEl.innerHTML='<div class="empty">No posts yet. Be the first to share something! Tap "＋ Create".</div>';
+    statusEl.textContent='';
+    return;
+  }
+  statusEl.textContent=posts.length+' posts';
+
+  let myLikedIds=new Set();
+  if(currentUser){
+    const {data:likes}=await puntadaSupabase.from('likes').select('post_id').eq('user_id',currentUser.id);
+    myLikedIds=new Set((likes||[]).map(l=>l.post_id));
+  }
+
+  const withCounts=await Promise.all(posts.map(async p=>{
+    const {count}=await puntadaSupabase.from('likes').select('*',{count:'exact',head:true}).eq('post_id',p.id);
+    return {...p, likeCount:count||0, liked:myLikedIds.has(p.id)};
+  }));
+
+  feedEl.innerHTML = withCounts.map(p=>`
+    <article class="card" data-id="${p.id}">
+      <div class="user"><div class="avatar">${(p.profiles?.full_name||'?')[0].toUpperCase()}</div>
+        <div><b>${escapeHtml(p.profiles?.full_name||'Member')}</b><div class="meta">${escapeHtml(p.profiles?.country||'')}</div></div></div>
+      <div class="postimg">🧵</div>
+      <div class="meta" style="color:var(--text);margin-bottom:6px">${escapeHtml(p.content)}</div>
+      <div class="actions">
+        <button class="like ${p.liked?'liked':''}">${p.liked?'♥':'♡'} ${p.likeCount}</button>
+        <button>💬 0</button>
+      </div>
+    </article>
+  `).join('');
+}
+
+document.getElementById('homeFeed').addEventListener('click', async (e)=>{
+  const btn=e.target.closest('.like');
+  if(!btn) return;
+  if(!currentUser){ toast('Log in to like posts'); openAuth('login'); return; }
+  const card=e.target.closest('[data-id]');
+  const postId=card.dataset.id;
+  const isLiked=btn.classList.contains('liked');
+  if(isLiked){
+    await puntadaSupabase.from('likes').delete().eq('post_id',postId).eq('user_id',currentUser.id);
+  } else {
+    await puntadaSupabase.from('likes').insert({post_id:postId, user_id:currentUser.id});
+  }
+  loadFeed();
+});
+
+/* ---------- INIT ---------- */
+refreshAuth();
 </script>
 </body>
 </html>
